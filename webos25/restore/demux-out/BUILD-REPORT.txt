@@ -212,5 +212,8 @@ installed RPU library against the supported native ABI.
   ABI      : ARM EABI5 soft-float, e_flags 0x05000200, maximum GLIBC 2.4
   NEEDED   : GStreamer and GLib libraries, libdl.so.2, libc.so.6
 
-This parser artifact comes from the existing parser-only build. On-device
-verification of this exact artifact remains pending.
+The owner verified this exact parser artifact on a webOS 25 TV using local
+test package 2.7.77 with the device profile enabled. Profile 7 FEL played
+correctly as the first title after a cold boot and after profile 5. A
+full-frame P7 title also cleared the active area from a preceding title
+with RPU letterbox offsets.
