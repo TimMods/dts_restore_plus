@@ -113,7 +113,7 @@ still shipped, but nothing listed there requires it.
 cd webos25/restore
 ./build.sh          # -> out/libgstdtsdec.so
 ./build-truehd.sh   # -> truehd-out/libgstlibav.so + libav*/libsw*
-./build-demux.sh    # -> demux-out/libgst{isomp4,mpegtsdemux,matroska,mpegpsdemux}.so
+./build-demux.sh    # -> demux-out/libgst{isomp4,mpegtsdemux,matroska,mpegpsdemux,videoparsersbad}.so
 ```
 
 Each build prints an ABI report — **confirm ARM EABI5 soft-float
@@ -174,7 +174,8 @@ cp -f  ../restore/edid-out/libedidaudio.so                              payload/
 cp -Pf ../restore/truehd-out/libgstlibav.so ../restore/truehd-out/libav*.so* \
        ../restore/truehd-out/libsw*.so*                                 payload/webos25-truehd/
 cp -f  ../restore/demux-out/libgstisomp4.so ../restore/demux-out/libgstmpegtsdemux.so \
-       ../restore/demux-out/libgstmatroska.so ../restore/demux-out/libgstmpegpsdemux.so payload/webos25-demux/
+       ../restore/demux-out/libgstmatroska.so ../restore/demux-out/libgstmpegpsdemux.so \
+       ../restore/demux-out/libgstvideoparsersbad.so payload/webos25-demux/
 cp -f  ../../gst/libgstlibav.so ../../gst/libgstisomp4.so \
        ../../gst/libgstmatroska.so ../../gst/libgstisomp4_1_8.so          payload/cx/
 npm install -g @webosose/ares-cli
