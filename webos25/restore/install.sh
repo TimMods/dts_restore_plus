@@ -16,6 +16,7 @@
 #     demux-out/libgstisomp4.so       mp4 demux, DTS re-enabled (OPTIONAL) [build-demux.sh]
 #     demux-out/libgstmpegtsdemux.so  ts/m2ts demux, DTS re-enabled (OPT.) [build-demux.sh]
 #     demux-out/libgstmatroska.so     mkv demux, Dolby Vision profile 7 (OPT.) [build-demux.sh]
+#     demux-out/libgstvideoparsersbad.so  Profile 7 RPU normalization (OPT.) [build-demux.sh]
 #     demux-out/libgstmpegpsdemux.so  vob/MPEG-PS demux, DTS re-enabled (OPT.) [build-demux.sh]
 #   (the boot/apply script is EMBEDDED in this installer - no sibling file needed)
 #
@@ -192,6 +193,7 @@ DMX_ISO=/usr/lib/gstreamer-1.0/libgstisomp4.so
 DMX_TSD=/usr/lib/gstreamer-1.0/libgstmpegtsdemux.so
 DMX_MKV=/usr/lib/gstreamer-1.0/libgstmatroska.so
 DMX_PSD=/usr/lib/gstreamer-1.0/libgstmpegpsdemux.so
+DMX_PARSE=/usr/lib/gstreamer-1.0/libgstvideoparsersbad.so
 mkdir -p "$DMX_DEST" || log "WARN: cannot create $DMX_DEST"
 for so in libgstisomp4.so libgstmpegtsdemux.so libgstmatroska.so libgstmpegpsdemux.so; do
   if [ -f "$SELF_DIR/demux-out/$so" ]; then
@@ -201,6 +203,20 @@ for so in libgstisomp4.so libgstmpegtsdemux.so libgstmatroska.so libgstmpegpsdem
     log "note: $SELF_DIR/demux-out/$so not found; its demuxer override will be skipped"
   fi
 done
+# Stage the parser by rename so an existing mapping keeps its previous bytes.
+P7_SOURCE=$SELF_DIR/demux-out/libgstvideoparsersbad.so
+P7_STAGED=$DMX_DEST/libgstvideoparsersbad.so
+if [ -f "$P7_SOURCE" ]; then
+  P7_TMP=$(mktemp "$P7_STAGED.XXXXXX")
+  if [ -n "$P7_TMP" ] && cp -f "$P7_SOURCE" "$P7_TMP" && chmod 0644 "$P7_TMP" && mv -f "$P7_TMP" "$P7_STAGED"; then
+    log "installed libgstvideoparsersbad.so -> $DMX_DEST/"
+  else
+    [ -z "$P7_TMP" ] || rm -f "$P7_TMP"
+    log "WARN: staging the Profile 7 parser failed"
+  fi
+else
+  rm -f "$P7_STAGED" || log "WARN: could not remove the previously staged Profile 7 parser"
+fi
 
 # --- 2d. Seed first-run audio defaults (make-up gain + DRC) -----------------
 # Gain and DRC shipped OPT-IN while the DSP was still unproven: no config file
@@ -241,7 +257,7 @@ fi
 # --- 3. Unmount any existing binds so we regenerate from PRISTINE originals -
 # This also has to leave the stock plugins we shadow unshadowed, because the
 # compatibility preflight in step 4b fingerprints them straight after.
-for T in "$CFG_LIVE" "$GC_LIVE" "$LGLIBAV" "$DMX_ISO" "$DMX_TSD" "$DMX_MKV" "$DMX_PSD" "$REG_TARGET" "$LLS_LIVE"; do
+for T in "$CFG_LIVE" "$GC_LIVE" "$LGLIBAV" "$DMX_ISO" "$DMX_TSD" "$DMX_MKV" "$DMX_PSD" "$DMX_PARSE" "$REG_TARGET" "$LLS_LIVE"; do
   w25_umount "$T"
 done
 
