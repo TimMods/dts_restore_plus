@@ -134,6 +134,9 @@ if grep -n 'target_pes_substream = 0x71' "$TSDEMUX"; then
 fi
 echo "=== DTS-HD patch OK (both BD DTS substreams passed on) ==="
 
+# Expose the HDMV TrueHD PID's AC-3 compatibility audio in PMT order.
+python3 "$(dirname "$0")/patch-hdmv-truehd-ac3.py" "$TSDEMUX"
+
 # Include Dolby Vision profile 7 STDL in the existing TS/M2TS HEVC caps branch.
 perl - "$TSDEMUX" <<'DV7TS_PL'
 use strict; use warnings;
